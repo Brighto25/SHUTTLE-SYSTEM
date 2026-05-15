@@ -1,10 +1,10 @@
-function BookingSummary({ user, form, selectedSeat, onProceed }) {
+function BookingSummary({ user, form, onProceed }) {
   const getPrice = () => {
     return form.from === "Science Station" ? "GH₵ 2.00" : "GH₵ 1.50";
   };
 
   return (
-    <div className="booking-panel" style={{ position: "sticky", top: "70px" }}>
+    <div className="booking-panel" style={{ marginTop: "1rem" }}>
       <h3>Booking Summary</h3>
 
       <div className="summary-row">
@@ -27,12 +27,6 @@ function BookingSummary({ user, form, selectedSeat, onProceed }) {
         <span className="summary-label">Time</span>
         <span className="summary-val">{form.time || "—"}</span>
       </div>
-      <div className="summary-row">
-        <span className="summary-label">Seat</span>
-        <span className="summary-val">
-          {selectedSeat ? "Seat " + selectedSeat : "Not selected"}
-        </span>
-      </div>
       <div
         className="summary-row"
         style={{ border: "none", paddingTop: ".75rem" }}
@@ -46,13 +40,7 @@ function BookingSummary({ user, form, selectedSeat, onProceed }) {
       <button
         className="btn btn-primary"
         style={{ marginTop: "1rem" }}
-        onClick={() => {
-          if (!selectedSeat) {
-            alert("Please select a seat first.");
-            return;
-          }
-          onProceed({ ...form, seat: selectedSeat, price: getPrice() });
-        }}
+        onClick={onProceed}
       >
         Proceed to Payment →
       </button>

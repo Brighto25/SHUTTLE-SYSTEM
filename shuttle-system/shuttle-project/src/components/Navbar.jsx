@@ -1,4 +1,9 @@
-function Navbar({ user }) {
+import { useState, useRef, useEffect } from "react";
+
+function Navbar({ user, onLogout }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
   const initials = user.name
     .split(" ")
     .map((w) => w[0])
@@ -6,19 +11,114 @@ function Navbar({ user }) {
     .slice(0, 2)
     .toUpperCase();
 
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
   return (
     <nav id="main-nav">
       <div className="nav-logo">
         Shuttle<span>Pass</span>
       </div>
-      <div className="nav-user">
-        <div style={{ textAlign: "right" }}>
+      <div className="nav-user" ref={ref} style={{ position: "relative" }}>
+        <div
+          style={{ textAlign: "right", cursor: "pointer" }}
+          onClick={() => setOpen((o) => !o)}
+        >
           <div style={{ fontWeight: 500, fontSize: ".88rem" }}>{user.name}</div>
           <div style={{ fontSize: ".75rem", color: "var(--text3)" }}>
             {user.index}
           </div>
         </div>
-        <div className="nav-avatar">{initials}</div>
+        <div
+          className="nav-avatar"
+          style={{ cursor: "pointer" }}
+          onClick={() => setOpen((o) => !o)}
+        >
+          {initials}
+        </div>
+
+        {open && (
+          <div
+            style={{
+              position: "absolute",
+              top: "calc(100% + .75rem)",
+              right: 0,
+              background: "var(--bg2)",
+              border: "1px solid var(--border2)",
+              borderRadius: "var(--radius)",
+              padding: ".5rem",
+              minWidth: "180px",
+              zIndex: 200,
+            }}
+          >
+            <div
+              style={{
+                padding: ".6rem .85rem",
+                fontSize: ".82rem",
+                color: "var(--text2)",
+                borderBottom: "1px solid var(--border)",
+                marginBottom: ".25rem",
+              }}
+            >
+              Signed in as
+              <br />
+              <span style={{ color: "var(--text)", fontWeight: 500 }}>
+                {user.name}
+              </span>
+            </div>
+            <button
+              onClick={onLogout}
+              style={{
+                width: "100%",
+                padding: ".6rem .85rem",
+                background: "transparent",
+                border: "none",
+                color: "var(--red)",
+                fontSize: ".88rem",
+                textAlign: "left",
+                cursor: "pointer",
+                borderRadius: "6px",
+                fontFamily: "DM Sans, sans-serif",
+              }}
+              onMouseEnter={(e) =>
+                (e.target.style.background = "rgba(239,68,68,.08)")
+              }
+              onMouseLeave={(e) => (e.target.style.background = "transparent")}
+            >
+              Sign Out
+            </button>
+            <button
+              onClick={() => {
+                onLogout();
+              }}
+              style={{
+                width: "100%",
+                padding: ".6rem .85rem",
+                background: "transparent",
+                border: "none",
+                color: "var(--text2)",
+                fontSize: ".88rem",
+                textAlign: "left",
+                cursor: "pointer",
+                borderRadius: "6px",
+                fontFamily: "DM Sans, sans-serif",
+              }}
+              onMouseEnter={(e) =>
+                (e.target.style.background = "var(--surface)")
+              }
+              onMouseLeave={(e) => (e.target.style.background = "transparent")}
+            >
+              Switch Account
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );

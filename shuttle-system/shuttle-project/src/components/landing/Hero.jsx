@@ -1,4 +1,4 @@
-function Hero({ onBook }) {
+function Hero({ onBook, onSchedule }) {
   return (
     <div className="hero">
       <div className="hero-tag">
@@ -20,7 +20,7 @@ function Hero({ onBook }) {
         <button className="btn btn-primary" onClick={onBook}>
           Book a Ticket →
         </button>
-        <button className="btn btn-outline" onClick={onBook}>
+        <button className="btn btn-outline" onClick={onSchedule}>
           View Schedules
         </button>
       </div>

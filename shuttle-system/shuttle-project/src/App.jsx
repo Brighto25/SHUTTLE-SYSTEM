@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DepartureBoard from "./components/landing/DepartureBoard";
 import Navbar from "./components/Navbar";
 import AuthPage from "./components/auth/AuthPage";
 import LandingPage from "./components/landing/LandingPage";
@@ -20,6 +21,12 @@ function App() {
     setCurrentPage("landing");
   };
 
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setCurrentPage("auth");
+    setBookingData({});
+  };
+
   const handleSelectRoute = (route) => {
     updateBooking(route);
     setCurrentPage("booking");
@@ -35,6 +42,10 @@ function App() {
     setCurrentPage("confirm");
   };
 
+  const handleSchedule = () => {
+    setCurrentPage("schedule");
+  };
+
   const handleBookAnother = () => {
     setBookingData({});
     setCurrentPage("landing");
@@ -42,7 +53,7 @@ function App() {
 
   return (
     <>
-      {currentUser && <Navbar user={currentUser} />}
+      {currentUser && <Navbar user={currentUser} onLogout={handleLogout} />}
 
       {currentPage === "auth" && <AuthPage onLogin={handleLogin} />}
 
@@ -50,9 +61,26 @@ function App() {
         <LandingPage
           onBook={() => setCurrentPage("booking")}
           onSelectRoute={handleSelectRoute}
+          onSchedule={handleSchedule}
         />
       )}
 
+      {currentPage === "schedule" && (
+        <div id="page-schedule">
+          <div className="page-header">
+            <button
+              className="back-btn"
+              onClick={() => setCurrentPage("landing")}
+            >
+              ← Back
+            </button>
+            <h2>Shuttle Schedules</h2>
+          </div>
+          <div className="section">
+            <DepartureBoard />
+          </div>
+        </div>
+      )}
       {currentPage === "booking" && (
         <BookingPage
           user={currentUser}
