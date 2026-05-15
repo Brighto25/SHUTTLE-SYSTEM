@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>UCC ShuttlePass</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0e1a;
+    --bg2:#111827;
+    --bg3:#1c2333;
+    --surface:#1e2a3a;
+    --surface2:#243040;
+    --accent:#f5a623;
+    --accent2:#e8881a;
+    --green:#22c55e;
+    --red:#ef4444;
+    --text:#f0f4ff;
+    --text2:#8fa3be;
+    --text3:#4d6180;
+    --border:#2a3a52;
+    --border2:#3a4f6a;
+    --radius:12px;
+    --radius-sm:8px;
+  }
+  body{
+    font-family:'DM Sans',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  /* NAV */
+  nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:1rem 2rem;
+    border-bottom:1px solid var(--border);
+    background:var(--bg);
+    position:sticky;top:0;z-index:100;
+  }
+  .nav-logo{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:1.6rem;letter-spacing:2px;
+    color:var(--accent);
+  }
+  .nav-logo span{color:var(--text);}
+  .nav-user{display:flex;align-items:center;gap:.75rem;font-size:.85rem;color:var(--text2);}
+  .nav-avatar{
+    width:34px;height:34px;border-radius:50%;
+    background:var(--accent);color:#000;
+    font-weight:600;font-size:.8rem;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  /* PAGES */
+  .page{display:none;animation:fadeIn .35s ease;}
+  .page.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ===== AUTH PAGE ===== */
+  #page-auth{
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--bg);
+    padding:2rem;
+    position:relative;
+    overflow:hidden;
+  }
+  #page-auth::before{
+    content:'';
+    position:absolute;inset:0;
+    background:repeating-linear-gradient(
+      90deg,
+      transparent,transparent 39px,
+      var(--border) 39px,var(--border) 40px
+    ),repeating-linear-gradient(
+      0deg,
+      transparent,transparent 39px,
+      var(--border) 39px,var(--border) 40px
+    );
+    opacity:.25;
+  }
+  .auth-box{
+    width:100%;max-width:440px;
+    background:var(--bg2);
+    border:1px solid var(--border2);
+    border-radius:20px;
+    padding:2.5rem;
+    position:relative;z-index:1;
+  }
+  .auth-brand{
+    text-align:center;margin-bottom:2rem;
+  }
+  .auth-brand .logo{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:2.4rem;letter-spacing:3px;color:var(--accent);
+  }
+  .auth-brand .logo span{color:var(--text);}
+  .auth-brand p{font-size:.85rem;color:var(--text2);margin-top:.25rem;}
+  .auth-tabs{
+    display:flex;gap:.5rem;
+    background:var(--bg3);
+    border-radius:var(--radius-sm);
+    padding:.25rem;
+    margin-bottom:1.75rem;
+  }
+  .auth-tab{
+    flex:1;padding:.55rem;border-radius:6px;border:none;
+    background:transparent;color:var(--text2);
+    font-family:'DM Sans',sans-serif;font-size:.9rem;cursor:pointer;
+    transition:all .2s;
+  }
+  .auth-tab.active{background:var(--surface2);color:var(--text);font-weight:500;}
+  .form-group{margin-bottom:1.1rem;}
+  .form-group label{display:block;font-size:.8rem;color:var(--text2);margin-bottom:.4rem;letter-spacing:.5px;text-transform:uppercase;}
+  .form-group input,.form-group select{
+    width:100%;padding:.75rem 1rem;
+    background:var(--bg3);
+    border:1px solid var(--border2);
+    border-radius:var(--radius-sm);
+    color:var(--text);
+    font-family:'DM Sans',sans-serif;font-size:.95rem;
+    transition:border-color .2s;
+    outline:none;
+  }
+  .form-group input:focus{border-color:var(--accent);}
+  .btn{
+    width:100%;padding:.85rem;border:none;border-radius:var(--radius-sm);
+    font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;
+    cursor:pointer;transition:all .2s;
+  }
+  .btn-primary{background:var(--accent);color:#000;}
+  .btn-primary:hover{background:var(--accent2);transform:translateY(-1px);}
+  .btn-outline{background:transparent;color:var(--accent);border:1px solid var(--accent);}
+  .btn-outline:hover{background:rgba(245,166,35,.08);}
+  .auth-hint{font-size:.78rem;color:var(--text3);text-align:center;margin-top:1rem;}
+  .auth-hint b{color:var(--accent);font-weight:500;}
+
+  /* ===== LANDING PAGE ===== */
+  .hero{
+    padding:4rem 2rem 3rem;
+    max-width:1000px;margin:0 auto;
+  }
+  .hero-tag{
+    display:inline-flex;align-items:center;gap:.4rem;
+    background:rgba(245,166,35,.12);
+    border:1px solid rgba(245,166,35,.3);
+    border-radius:999px;padding:.3rem .85rem;
+    font-size:.78rem;color:var(--accent);letter-spacing:.5px;text-transform:uppercase;
+    margin-bottom:1.25rem;
+  }
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s ease infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .hero h1{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(3rem,8vw,5.5rem);
+    line-height:.95;letter-spacing:2px;
+    color:var(--text);
+    margin-bottom:1rem;
+  }
+  .hero h1 span{color:var(--accent);}
+  .hero p{font-size:1.05rem;color:var(--text2);max-width:520px;line-height:1.7;}
+  .hero-cta{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+  .hero-cta .btn{width:auto;padding:.75rem 2rem;}
+
+  /* ROUTE CARDS */
+  .section{padding:1rem 2rem 3rem;max-width:1000px;margin:0 auto;}
+  .section-title{font-size:.75rem;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:1.25rem;}
+  .routes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;}
+  .route-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:1.25rem;
+    cursor:pointer;
+    transition:all .2s;
+    position:relative;overflow:hidden;
+  }
+  .route-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:var(--accent);transform:scaleX(0);transform-origin:left;
+    transition:transform .25s;
+  }
+  .route-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+  .route-card:hover::before{transform:scaleX(1);}
+  .route-card.selected{border-color:var(--accent);background:var(--surface2);}
+  .route-card.selected::before{transform:scaleX(1);}
+  .route-from-to{display:flex;align-items:center;gap:.5rem;font-size:.95rem;font-weight:500;margin-bottom:.5rem;}
+  .route-arrow{color:var(--accent);font-size:1.1rem;}
+  .route-meta{font-size:.78rem;color:var(--text2);}
+  .route-badge{
+    display:inline-block;padding:.2rem .6rem;border-radius:4px;
+    font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;
+    background:rgba(34,197,94,.12);color:var(--green);
+    margin-bottom:.6rem;
+  }
+
+  /* STATUS BOARD */
+  .status-board{
+    background:var(--bg2);border:1px solid var(--border);
+    border-radius:var(--radius);padding:1.5rem;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .status-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
+  .status-title{font-size:.8rem;color:var(--accent);letter-spacing:2px;text-transform:uppercase;}
+  .status-time{font-size:.75rem;color:var(--text2);}
+  .status-row{
+    display:grid;grid-template-columns:1fr 80px 80px 80px;
+    gap:.5rem;padding:.6rem 0;
+    border-bottom:1px solid var(--border);
+    font-size:.8rem;align-items:center;
+  }
+  .status-row:last-child{border:none;}
+  .status-row.header{color:var(--text3);font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;}
+  .status-available{color:var(--green);}
+  .status-limited{color:var(--accent);}
+  .status-full{color:var(--red);}
+
+  /* ===== BOOKING PAGE ===== */
+  .booking-layout{display:grid;grid-template-columns:1fr 320px;gap:1.5rem;padding:2rem;max-width:1000px;margin:0 auto;}
+  @media(max-width:700px){.booking-layout{grid-template-columns:1fr;}}
+  .booking-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;}
+  .booking-panel h3{font-size:1rem;font-weight:600;margin-bottom:1.25rem;color:var(--text);}
+
+  /* SEAT MAP */
+  .seat-legend{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;font-size:.78rem;color:var(--text2);}
+  .seat-legend-item{display:flex;align-items:center;gap:.35rem;}
+  .legend-dot{width:14px;height:14px;border-radius:3px;}
+  .shuttle-visual{
+    background:var(--bg3);border-radius:var(--radius);
+    padding:1rem;margin-bottom:1rem;
+    position:relative;
+  }
+  .shuttle-front{
+    background:var(--surface2);border-radius:8px 8px 0 0;
+    padding:.4rem;text-align:center;
+    font-size:.72rem;color:var(--text3);
+    letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem;
+    border:1px solid var(--border);border-bottom:none;
+  }
+  .driver-area{
+    background:var(--bg2);border:1px dashed var(--border2);
+    border-radius:var(--radius-sm);padding:.5rem 1rem;
+    text-align:center;font-size:.75rem;color:var(--text3);
+    margin-bottom:1rem;
+  }
+  .seats-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:6px;
+  }
+  .seat{
+    aspect-ratio:1;border-radius:6px;border:1.5px solid;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.65rem;font-family:'JetBrains Mono',monospace;
+    cursor:pointer;transition:all .15s;user-select:none;
+  }
+  .seat.available{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.3);color:var(--green);}
+  .seat.available:hover{background:rgba(34,197,94,.2);border-color:var(--green);}
+  .seat.taken{background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.2);color:var(--red);cursor:not-allowed;}
+  .seat.selected{background:rgba(245,166,35,.15);border-color:var(--accent);color:var(--accent);}
+  .seat.aisle{background:transparent;border-color:transparent;cursor:default;}
+
+  /* BOOKING SUMMARY */
+  .summary-row{display:flex;justify-content:space-between;align-items:center;padding:.55rem 0;border-bottom:1px solid var(--border);font-size:.88rem;}
+  .summary-row:last-child{border:none;}
+  .summary-label{color:var(--text2);}
+  .summary-val{font-weight:500;}
+  .price-total{font-size:1.3rem;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:var(--accent);}
+  .input-sm{
+    width:100%;padding:.55rem .75rem;
+    background:var(--bg3);border:1px solid var(--border2);
+    border-radius:var(--radius-sm);color:var(--text);
+    font-family:'DM Sans',sans-serif;font-size:.88rem;
+    outline:none;transition:border-color .2s;margin-top:.25rem;
+  }
+  .input-sm:focus{border-color:var(--accent);}
+  .form-label{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;}
+  .field-group{margin-bottom:.85rem;}
+
+  /* ===== PAYMENT PAGE ===== */
+  .payment-wrap{max-width:500px;margin:2rem auto;padding:0 1rem;}
+  .payment-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;}
+  .pay-methods{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1.25rem 0;}
+  .pay-method{
+    padding:1rem;border-radius:var(--radius-sm);
+    border:1.5px solid var(--border);
+    cursor:pointer;transition:all .2s;text-align:center;
+  }
+  .pay-method:hover{border-color:var(--border2);}
+  .pay-method.active{border-color:var(--accent);background:rgba(245,166,35,.06);}
+  .pay-method .method-icon{font-size:1.5rem;margin-bottom:.35rem;}
+  .pay-method .method-name{font-size:.85rem;font-weight:500;}
+  .pay-method .method-sub{font-size:.72rem;color:var(--text2);}
+  .pay-num-input{
+    display:flex;align-items:center;gap:.5rem;
+    background:var(--bg3);border:1px solid var(--border2);
+    border-radius:var(--radius-sm);padding:.1rem .75rem;
+    margin-bottom:1rem;
+  }
+  .pay-num-input span{font-size:.85rem;color:var(--text2);white-space:nowrap;}
+  .pay-num-input input{
+    flex:1;background:transparent;border:none;outline:none;
+    color:var(--text);font-family:'JetBrains Mono',monospace;
+    font-size:.95rem;padding:.65rem .25rem;
+  }
+  .amount-display{
+    background:var(--bg3);border-radius:var(--radius-sm);
+    padding:1rem;text-align:center;margin-bottom:1.25rem;
+  }
+  .amount-display .amt{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--accent);letter-spacing:1px;}
+  .amount-display .amt-label{font-size:.75rem;color:var(--text2);}
+  .pay-steps{display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:1.5rem;}
+  .pay-step{width:8px;height:8px;border-radius:50%;background:var(--border2);}
+  .pay-step.done{background:var(--green);}
+  .pay-step.active{background:var(--accent);width:24px;border-radius:4px;}
+
+  /* ===== CONFIRMATION / BOARDING PASS ===== */
+  .confirm-wrap{max-width:480px;margin:2rem auto;padding:0 1rem;}
+  .boarding-pass{
+    background:var(--bg2);
+    border:1px solid var(--border2);
+    border-radius:20px;
+    overflow:hidden;
+    position:relative;
+  }
+  .bp-header{
+    background:var(--accent);
+    padding:1.5rem;
+    display:flex;justify-content:space-between;align-items:flex-start;
+  }
+  .bp-header .airline{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:#000;}
+  .bp-header .trip-type{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(0,0,0,.6);}
+  .bp-status-badge{
+    background:#000;color:var(--accent);
+    padding:.25rem .7rem;border-radius:999px;
+    font-size:.72rem;font-weight:600;letter-spacing:.5px;
+  }
+  .bp-route{
+    padding:1.5rem;display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px dashed var(--border2);
+  }
+  .bp-station h2{font-size:1.8rem;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:var(--text);}
+  .bp-station p{font-size:.72rem;color:var(--text2);}
+  .bp-arrow{
+    text-align:center;flex:1;
+    font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--accent);
+  }
+  .bp-details{
+    padding:1.25rem 1.5rem;
+    display:grid;grid-template-columns:1fr 1fr 1fr;
+    gap:.75rem;
+    border-bottom:1px dashed var(--border2);
+  }
+  .bp-detail label{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:.2rem;}
+  .bp-detail span{font-size:.95rem;font-weight:500;color:var(--text);}
+  .bp-codes{
+    padding:1.5rem;
+    display:grid;grid-template-columns:1fr 1fr;
+    gap:1rem;
+  }
+  .bp-code-box{
+    background:var(--bg3);border-radius:var(--radius-sm);
+    padding:1rem;text-align:center;
+  }
+  .bp-code-box label{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:.5rem;}
+  .bp-code-box .code{
+    font-family:'JetBrains Mono',monospace;
+    font-size:1.2rem;font-weight:600;
+    color:var(--accent);letter-spacing:3px;
+  }
+  .bp-code-box .otp{font-size:2rem;}
+  .bp-barcode{
+    padding:0 1.5rem 1.5rem;
+    display:flex;justify-content:center;
+  }
+  .barcode-visual{
+    height:48px;display:flex;align-items:center;gap:2px;
+  }
+  .barcode-visual div{
+    height:100%;border-radius:1px;
+    background:var(--text2);
+  }
+  .bp-footer{
+    background:var(--bg3);padding:1rem 1.5rem;
+    font-size:.75rem;color:var(--text3);text-align:center;
+    line-height:1.6;
+  }
+  .success-badge{
+    text-align:center;margin-bottom:1.5rem;
+    padding-top:1.5rem;
+  }
+  .success-circle{
+    width:56px;height:56px;border-radius:50%;
+    background:rgba(34,197,94,.12);border:2px solid var(--green);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto .75rem;font-size:1.5rem;color:var(--green);
+  }
+  .success-badge h2{font-size:1.1rem;font-weight:600;color:var(--text);}
+  .success-badge p{font-size:.85rem;color:var(--text2);}
+
+  .page-header{padding:1.5rem 2rem .5rem;display:flex;align-items:center;gap:1rem;}
+  .page-header h2{font-size:1.2rem;font-weight:600;}
+  .back-btn{
+    background:transparent;border:1px solid var(--border);
+    border-radius:var(--radius-sm);padding:.4rem .85rem;
+    color:var(--text2);font-size:.85rem;cursor:pointer;
+    font-family:'DM Sans',sans-serif;transition:all .2s;
+  }
+  .back-btn:hover{border-color:var(--border2);color:var(--text);}
+
+  .processing{text-align:center;padding:2rem;}
+  .spinner{
+    width:40px;height:40px;border-radius:50%;
+    border:3px solid var(--border2);border-top-color:var(--accent);
+    animation:spin .8s linear infinite;margin:0 auto 1rem;
+  }
+  @keyframes spin{to{rotate:360deg}}
+
+  .error-msg{
+    background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);
+    border-radius:var(--radius-sm);padding:.6rem .85rem;
+    font-size:.82rem;color:var(--red);margin-bottom:.85rem;display:none;
+  }
+</style>
+</head>
+<body>
+
+<nav id="main-nav" style="display:none;">
+  <div class="nav-logo">Shuttle<span>Pass</span></div>
+  <div class="nav-user">
+    <div style="text-align:right;">
+      <div style="font-weight:500;font-size:.88rem;" id="nav-name">Kofi Mensah</div>
+      <div style="font-size:.75rem;color:var(--text3);">UCC/CS/21/0042</div>
+    </div>
+    <div class="nav-avatar" id="nav-avatar">KM</div>
+  </div>
+</nav>
+
+<!-- AUTH PAGE -->
+<div id="page-auth" class="page active">
+  <div class="auth-box">
+    <div class="auth-brand">
+      <div class="logo">Shuttle<span>Pass</span></div>
+      <p>University of Cape Coast — Internal Shuttle Network</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('signin')">Sign In</button>
+      <button class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</button>
+    </div>
+    <div id="auth-error" class="error-msg">Incorrect index number or password.</div>
+
+    <!-- SIGN IN -->
+    <div id="tab-signin">
+      <div class="form-group">
+        <label>Index Number</label>
+        <input type="text" id="si-index" placeholder="e.g. UCC/CS/21/0042" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="si-pass" placeholder="Enter your password" />
+      </div>
+      <button class="btn btn-primary" style="margin-top:.5rem" onclick="handleSignIn()">Sign In →</button>
+      <p class="auth-hint">Demo: use index <b>UCC/CS/21/0042</b> / pass <b>demo123</b></p>
+    </div>
+
+    <!-- SIGN UP -->
+    <div id="tab-signup" style="display:none;">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="su-name" placeholder="e.g. Kwame Asante" />
+      </div>
+      <div class="form-group">
+        <label>Index Number</label>
+        <input type="text" id="su-index" placeholder="e.g. UCC/CS/22/0101" />
+      </div>
+      <div class="form-group">
+        <label>Programme</label>
+        <select id="su-prog">
+          <option value="">Select programme</option>
+          <option>BSc Computer Science</option>
+          <option>BSc Information Technology</option>
+          <option>BA Economics</option>
+          <option>BSc Mathematics</option>
+          <option>BSc Physics</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="su-pass" placeholder="Create a password" />
+      </div>
+      <button class="btn btn-primary" style="margin-top:.5rem" onclick="handleSignUp()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<!-- LANDING PAGE -->
+<div id="page-landing" class="page">
+  <div class="hero">
+    <div class="hero-tag"><span class="dot"></span> Shuttle service active</div>
+    <h1>Book Your<br><span>Campus</span> Ride.</h1>
+    <p>Reserve a seat on the UCC internal shuttle — connecting Science Station, New Site, Old Site, NLT and SWLT in minutes.</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary" onclick="goTo('booking')">Book a Ticket →</button>
+      <button class="btn btn-outline" onclick="goTo('booking')">View Schedules</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Available Routes</div>
+    <div class="routes-grid">
+      <div class="route-card" onclick="selectRoute(this,'Science Station','NLT','GH₵ 2.00')">
+        <div class="route-badge">Available</div>
+        <div class="route-from-to">Science Station <span class="route-arrow">→</span> NLT</div>
+        <div class="route-meta">New Lecture Theatre · GH₵ 2.00</div>
+      </div>
+      <div class="route-card" onclick="selectRoute(this,'Science Station','SWLT','GH₵ 2.00')">
+        <div class="route-badge">Available</div>
+        <div class="route-from-to">Science Station <span class="route-arrow">→</span> SWLT</div>
+        <div class="route-meta">South West Lecture Theatre · GH₵ 2.00</div>
+      </div>
+      <div class="route-card" onclick="selectRoute(this,'New Site Station','NLT','GH₵ 1.50')">
+        <div class="route-badge">Available</div>
+        <div class="route-from-to">New Site Station <span class="route-arrow">→</span> NLT</div>
+        <div class="route-meta">New Lecture Theatre · GH₵ 1.50</div>
+      </div>
+      <div class="route-card" onclick="selectRoute(this,'Old Site Station','SWLT','GH₵ 1.50')">
+        <div class="route-badge">Available</div>
+        <div class="route-from-to">Old Site Station <span class="route-arrow">→</span> SWLT</div>
+        <div class="route-meta">South West Lecture Theatre · GH₵ 1.50</div>
+      </div>
+      <div class="route-card" onclick="selectRoute(this,'New Site Station','Science Station','GH₵ 1.50')">
+        <div class="route-badge">Available</div>
+        <div class="route-from-to">New Site <span class="route-arrow">→</span> Science Station</div>
+        <div class="route-meta">Main Hub · GH₵ 1.50</div>
+      </div>
+      <div class="route-card" onclick="selectRoute(this,'Old Site Station','Science Station','GH₵ 1.50')">
+        <div class="route-badge">Available</div>
+        <div class="route-from-to">Old Site <span class="route-arrow">→</span> Science Station</div>
+        <div class="route-meta">Main Hub · GH₵ 1.50</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Live Shuttle Board</div>
+    <div class="status-board">
+      <div class="status-header">
+        <span class="status-title">▶ Departures</span>
+        <span class="status-time" id="live-time">—</span>
+      </div>
+      <div class="status-row header">
+        <span>Route</span><span>Departs</span><span>Seats</span><span>Status</span>
+      </div>
+      <div class="status-row"><span>Sci. Stn → NLT</span><span>07:30</span><span>18 left</span><span class="status-available">OPEN</span></div>
+      <div class="status-row"><span>New Site → NLT</span><span>07:45</span><span>4 left</span><span class="status-limited">LIMITED</span></div>
+      <div class="status-row"><span>Old Site → SWLT</span><span>08:00</span><span>0 left</span><span class="status-full">FULL</span></div>
+      <div class="status-row"><span>Sci. Stn → SWLT</span><span>08:15</span><span>32 left</span><span class="status-available">OPEN</span></div>
+      <div class="status-row"><span>New Site → Sci.</span><span>08:30</span><span>12 left</span><span class="status-available">OPEN</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- BOOKING PAGE -->
+<div id="page-booking" class="page">
+  <div class="page-header">
+    <button class="back-btn" onclick="goTo('landing')">← Back</button>
+    <h2>Reserve Your Seat</h2>
+  </div>
+  <div class="booking-layout">
+    <div>
+      <!-- Route selector -->
+      <div class="booking-panel" style="margin-bottom:1rem;">
+        <h3>Journey Details</h3>
+        <div class="field-group">
+          <div class="form-label">From</div>
+          <select class="input-sm" id="bk-from" onchange="updateSummary()">
+            <option value="Science Station">Science Station</option>
+            <option value="New Site Station">New Site Station</option>
+            <option value="Old Site Station">Old Site Station</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="form-label">To</div>
+          <select class="input-sm" id="bk-to" onchange="updateSummary()">
+            <option value="NLT">NLT — New Lecture Theatre</option>
+            <option value="SWLT">SWLT — South West Lecture Theatre</option>
+            <option value="Science Station">Science Station</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="form-label">Date</div>
+          <input type="date" class="input-sm" id="bk-date" />
+        </div>
+        <div class="field-group">
+          <div class="form-label">Time Slot</div>
+          <select class="input-sm" id="bk-time" onchange="updateSummary()">
+            <option>07:30 AM</option>
+            <option>08:00 AM</option>
+            <option>08:30 AM</option>
+            <option>09:00 AM</option>
+            <option>10:00 AM</option>
+            <option>12:00 PM</option>
+            <option>02:00 PM</option>
+            <option>04:00 PM</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Seat Map -->
+      <div class="booking-panel">
+        <h3>Choose a Seat <span style="font-size:.78rem;color:var(--text2);font-weight:400;">(50 seats)</span></h3>
+        <div class="seat-legend">
+          <div class="seat-legend-item"><div class="legend-dot" style="background:rgba(34,197,94,.2);border:1px solid rgba(34,197,94,.5);"></div> Available</div>
+          <div class="seat-legend-item"><div class="legend-dot" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);"></div> Taken</div>
+          <div class="seat-legend-item"><div class="legend-dot" style="background:rgba(245,166,35,.2);border:1px solid var(--accent);"></div> Selected</div>
+        </div>
+        <div class="shuttle-visual">
+          <div class="shuttle-front">◄ FRONT — DRIVER CABIN ►</div>
+          <div class="driver-area">🚌 Driver</div>
+          <div class="seats-grid" id="seats-grid"></div>
+        </div>
+        <div id="seat-selection-msg" style="font-size:.82rem;color:var(--text2);text-align:center;padding:.5rem 0;">Tap a seat to select it</div>
+      </div>
+    </div>
+
+    <!-- Summary Panel -->
+    <div>
+      <div class="booking-panel" style="position:sticky;top:70px;">
+        <h3>Booking Summary</h3>
+        <div class="summary-row"><span class="summary-label">Passenger</span><span class="summary-val" id="sum-name">—</span></div>
+        <div class="summary-row"><span class="summary-label">Index No.</span><span class="summary-val" id="sum-index">—</span></div>
+        <div class="summary-row"><span class="summary-label">From</span><span class="summary-val" id="sum-from">—</span></div>
+        <div class="summary-row"><span class="summary-label">To</span><span class="summary-val" id="sum-to">—</span></div>
+        <div class="summary-row"><span class="summary-label">Time</span><span class="summary-val" id="sum-time">—</span></div>
+        <div class="summary-row"><span class="summary-label">Seat</span><span class="summary-val" id="sum-seat">Not selected</span></div>
+        <div class="summary-row" style="border:none;padding-top:.75rem;">
+          <span class="summary-label" style="font-size:1rem;">Total</span>
+          <span class="price-total" id="sum-price">GH₵ 2.00</span>
+        </div>
+        <button class="btn btn-primary" style="margin-top:1rem;" onclick="proceedToPayment()">Proceed to Payment →</button>
+        <p style="font-size:.72rem;color:var(--text3);text-align:center;margin-top:.6rem;">Secured · MoMo / eCash accepted</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT PAGE -->
+<div id="page-payment" class="page">
+  <div class="page-header">
+    <button class="back-btn" onclick="goTo('booking')">← Back</button>
+    <h2>Complete Payment</h2>
+  </div>
+  <div class="payment-wrap">
+    <div class="payment-card">
+      <div class="pay-steps">
+        <div class="pay-step done"></div>
+        <div class="pay-step active"></div>
+        <div class="pay-step"></div>
+      </div>
+      <div style="font-size:.82rem;color:var(--text2);text-align:center;margin-bottom:1.25rem;">Step 2 of 3 — Payment</div>
+
+      <div class="amount-display">
+        <div class="amt-label">Amount Due</div>
+        <div class="amt" id="pay-amount">GH₵ 2.00</div>
+        <div style="font-size:.75rem;color:var(--text2);margin-top:.25rem;" id="pay-route-label">Science Station → NLT</div>
+      </div>
+
+      <div style="font-size:.82rem;color:var(--text2);margin-bottom:.5rem;">Select payment method</div>
+      <div class="pay-methods">
+        <div class="pay-method active" id="momo-btn" onclick="selectPayMethod('momo')">
+          <div class="method-icon">📱</div>
+          <div class="method-name">MoMo</div>
+          <div class="method-sub">MTN Mobile Money</div>
+        </div>
+        <div class="pay-method" id="ecash-btn" onclick="selectPayMethod('ecash')">
+          <div class="method-icon">💳</div>
+          <div class="method-name">eCash</div>
+          <div class="method-sub">Vodafone eCash</div>
+        </div>
+      </div>
+
+      <div id="pay-error" class="error-msg">Please enter a valid phone number.</div>
+
+      <div class="form-label" style="margin-bottom:.4rem;" id="pay-num-label">MTN MoMo Number</div>
+      <div class="pay-num-input">
+        <span id="pay-prefix">+233</span>
+        <input type="tel" id="pay-number" placeholder="24 000 0000" maxlength="10"/>
+      </div>
+
+      <div id="processing-div" style="display:none;">
+        <div class="processing">
+          <div class="spinner"></div>
+          <div style="font-size:.9rem;color:var(--text2);">Processing payment…</div>
+          <div style="font-size:.78rem;color:var(--text3);margin-top:.4rem;">A prompt has been sent to your phone</div>
+        </div>
+      </div>
+
+      <div id="pay-form-bottom">
+        <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:.75rem;font-size:.78rem;color:var(--text3);margin-bottom:1.25rem;line-height:1.6;">
+          ⚡ You will receive a <strong style="color:var(--text2);">mobile money prompt</strong> on your phone. Approve it to confirm your booking.
+        </div>
+        <button class="btn btn-primary" onclick="submitPayment()">Pay Now — <span id="btn-amount">GH₵ 2.00</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRMATION PAGE -->
+<div id="page-confirm" class="page">
+  <div class="confirm-wrap">
+    <div class="success-badge">
+      <div class="success-circle">✓</div>
+      <h2>Booking Confirmed!</h2>
+      <p>Show this pass to the driver when boarding</p>
+    </div>
+
+    <div class="boarding-pass">
+      <div class="bp-header">
+        <div>
+          <div class="airline">ShuttlePass · UCC</div>
+          <div class="trip-type">Internal Campus Shuttle</div>
+        </div>
+        <div class="bp-status-badge">CONFIRMED</div>
+      </div>
+
+      <div class="bp-route">
+        <div class="bp-station">
+          <h2 id="bp-from-code">SCI</h2>
+          <p id="bp-from-full">Science Station</p>
+        </div>
+        <div class="bp-arrow">——→</div>
+        <div class="bp-station" style="text-align:right;">
+          <h2 id="bp-to-code">NLT</h2>
+          <p id="bp-to-full">New Lecture Theatre</p>
+        </div>
+      </div>
+
+      <div class="bp-details">
+        <div class="bp-detail"><label>Passenger</label><span id="bp-name">Kofi Mensah</span></div>
+        <div class="bp-detail"><label>Seat</label><span id="bp-seat">A3</span></div>
+        <div class="bp-detail"><label>Departs</label><span id="bp-time">07:30 AM</span></div>
+        <div class="bp-detail"><label>Index No.</label><span id="bp-index">UCC/CS/21</span></div>
+        <div class="bp-detail"><label>Date</label><span id="bp-date">—</span></div>
+        <div class="bp-detail"><label>Amount</label><span id="bp-amount-label" style="color:var(--green);">GH₵ 2.00</span></div>
+      </div>
+
+      <div class="bp-codes">
+        <div class="bp-code-box">
+          <label>Booking ID</label>
+          <div class="code" id="bp-booking-id">SP-0000</div>
+        </div>
+        <div class="bp-code-box">
+          <label>OTP / Driver Code</label>
+          <div class="code otp" id="bp-otp">0000</div>
+        </div>
+      </div>
+
+      <div class="bp-barcode">
+        <div class="barcode-visual" id="barcode"></div>
+      </div>
+
+      <div class="bp-footer">
+        Present this pass to the driver · OTP expires after boarding<br>
+        For support: shuttle@ucc.edu.gh · 0332-098-000
+      </div>
+    </div>
+
+    <div style="margin-top:1.25rem;display:flex;gap:.75rem;">
+      <button class="btn btn-outline" onclick="goTo('landing')" style="flex:1;">Book Another</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="window.print()">Save / Print</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentUser = null;
+let selectedSeat = null;
+let payMethod = 'momo';
+let bookingData = {};
+
+const DEMO_USERS = [
+  {index:'UCC/CS/21/0042',pass:'demo123',name:'Kofi Mensah',programme:'BSc Computer Science'},
+];
+const registeredUsers = [...DEMO_USERS];
+
+function switchAuthTab(tab){
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',i===(tab==='signin'?0:1)));
+  document.getElementById('tab-signin').style.display = tab==='signin'?'block':'none';
+  document.getElementById('tab-signup').style.display = tab==='signup'?'block':'none';
+  document.getElementById('auth-error').style.display='none';
+}
+
+function handleSignIn(){
+  const idx = document.getElementById('si-index').value.trim();
+  const pass = document.getElementById('si-pass').value.trim();
+  const user = registeredUsers.find(u=>u.index===idx&&u.pass===pass);
+  if(!user){document.getElementById('auth-error').style.display='block';return;}
+  loginUser(user);
+}
+
+function handleSignUp(){
+  const name=document.getElementById('su-name').value.trim();
+  const idx=document.getElementById('su-index').value.trim();
+  const prog=document.getElementById('su-prog').value;
+  const pass=document.getElementById('su-pass').value.trim();
+  if(!name||!idx||!prog||!pass){alert('Please fill in all fields.');return;}
+  const newUser={index:idx,pass,name,programme:prog};
+  registeredUsers.push(newUser);
+  loginUser(newUser);
+}
+
+function loginUser(user){
+  currentUser=user;
+  document.getElementById('main-nav').style.display='flex';
+  document.getElementById('nav-name').textContent=user.name;
+  const initials=user.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('nav-avatar').textContent=initials;
+  document.getElementById('sum-name').textContent=user.name;
+  document.getElementById('sum-index').textContent=user.index;
+  goTo('landing');
+  setInterval(()=>{
+    const now=new Date();
+    const el=document.getElementById('live-time');
+    if(el)el.textContent=now.toLocaleTimeString('en-GH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  },1000);
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('bk-date').value=today;
+  document.getElementById('bk-date').min=today;
+}
+
+function goTo(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  window.scrollTo(0,0);
+  if(page==='booking') buildSeats();
+  if(page==='landing') updateSummary();
+}
+
+function selectRoute(el,from,to,price){
+  document.getElementById('bk-from').value=from;
+  const toSelect=document.getElementById('bk-to');
+  for(let opt of toSelect.options){if(opt.value===to){opt.selected=true;break;}}
+  updateSummary();
+  goTo('booking');
+}
+
+const TAKEN_SEATS=[2,5,9,14,18,22,27,31,35,38,42,46];
+
+function buildSeats(){
+  const grid=document.getElementById('seats-grid');
+  grid.innerHTML='';
+  selectedSeat=null;
+  document.getElementById('seat-selection-msg').textContent='Tap a seat to select it';
+  document.getElementById('sum-seat').textContent='Not selected';
+  for(let i=1;i<=50;i++){
+    const s=document.createElement('div');
+    s.className='seat '+(TAKEN_SEATS.includes(i)?'taken':'available');
+    s.textContent=i;
+    s.dataset.num=i;
+    if(!TAKEN_SEATS.includes(i)) s.onclick=()=>chooseSeat(i,s);
+    if(i%4===2){
+      const aisle=document.createElement('div');
+      aisle.className='seat aisle';
+      grid.appendChild(s);
+      grid.appendChild(aisle);
+    } else {
+      grid.appendChild(s);
+    }
+  }
+}
+
+function chooseSeat(num,el){
+  document.querySelectorAll('.seat.selected').forEach(s=>{s.classList.remove('selected');s.classList.add('available');});
+  el.classList.remove('available');el.classList.add('selected');
+  selectedSeat=num;
+  document.getElementById('seat-selection-msg').textContent=`Seat ${num} selected ✓`;
+  document.getElementById('sum-seat').textContent='Seat '+num;
+}
+
+function getPrice(){
+  const from=document.getElementById('bk-from').value;
+  const to=document.getElementById('bk-to').value;
+  if(from==='Science Station') return 'GH₵ 2.00';
+  return 'GH₵ 1.50';
+}
+
+function updateSummary(){
+  const from=document.getElementById('bk-from')?.value||'—';
+  const to=document.getElementById('bk-to')?.value||'—';
+  const time=document.getElementById('bk-time')?.value||'—';
+  document.getElementById('sum-from').textContent=from;
+  document.getElementById('sum-to').textContent=to;
+  document.getElementById('sum-time').textContent=time;
+  document.getElementById('sum-price').textContent=getPrice();
+}
+
+function proceedToPayment(){
+  if(!selectedSeat){alert('Please select a seat first.');return;}
+  const from=document.getElementById('bk-from').value;
+  const to=document.getElementById('bk-to').value;
+  const time=document.getElementById('bk-time').value;
+  const price=getPrice();
+  bookingData={from,to,time,price,seat:selectedSeat,date:document.getElementById('bk-date').value};
+  document.getElementById('pay-amount').textContent=price;
+  document.getElementById('btn-amount').textContent=price;
+  document.getElementById('pay-route-label').textContent=from+' → '+to;
+  goTo('payment');
+}
+
+function selectPayMethod(m){
+  payMethod=m;
+  document.getElementById('momo-btn').classList.toggle('active',m==='momo');
+  document.getElementById('ecash-btn').classList.toggle('active',m==='ecash');
+  document.getElementById('pay-num-label').textContent=m==='momo'?'MTN MoMo Number':'Vodafone eCash Number';
+  document.getElementById('pay-prefix').textContent='+233';
+  document.getElementById('pay-number').value='';
+}
+
+function submitPayment(){
+  const num=document.getElementById('pay-number').value.trim();
+  if(num.length<9){document.getElementById('pay-error').style.display='block';return;}
+  document.getElementById('pay-error').style.display='none';
+  document.getElementById('pay-form-bottom').style.display='none';
+  document.getElementById('processing-div').style.display='block';
+  setTimeout(()=>{buildBoardingPass();goTo('confirm');
+    document.getElementById('pay-form-bottom').style.display='block';
+    document.getElementById('processing-div').style.display='none';
+  },2200);
+}
+
+function stationCode(name){
+  if(name.includes('NLT')) return 'NLT';
+  if(name.includes('SWLT')) return 'SWLT';
+  if(name.includes('Science')) return 'SCI';
+  if(name.includes('New Site')) return 'NSW';
+  if(name.includes('Old Site')) return 'OSW';
+  return name.slice(0,3).toUpperCase();
+}
+
+function buildBoardingPass(){
+  const id='SP-'+Math.random().toString(36).substr(2,6).toUpperCase();
+  const otp=String(Math.floor(1000+Math.random()*9000));
+  document.getElementById('bp-booking-id').textContent=id;
+  document.getElementById('bp-otp').textContent=otp;
+  document.getElementById('bp-from-code').textContent=stationCode(bookingData.from);
+  document.getElementById('bp-from-full').textContent=bookingData.from;
+  document.getElementById('bp-to-code').textContent=stationCode(bookingData.to);
+  document.getElementById('bp-to-full').textContent=bookingData.to;
+  document.getElementById('bp-name').textContent=currentUser?.name||'Student';
+  document.getElementById('bp-index').textContent=currentUser?.index||'—';
+  document.getElementById('bp-seat').textContent='Seat '+bookingData.seat;
+  document.getElementById('bp-time').textContent=bookingData.time;
+  document.getElementById('bp-date').textContent=bookingData.date||new Date().toLocaleDateString('en-GH');
+  document.getElementById('bp-amount-label').textContent=bookingData.price;
+  const bc=document.getElementById('barcode');
+  bc.innerHTML='';
+  for(let i=0;i<60;i++){
+    const bar=document.createElement('div');
+    const w=Math.random()<.4?1:Math.random()<.5?2:3;
+    bar.style.cssText=`width:${w}px;margin-right:${Math.random()<.5?1:0}px;opacity:${.4+Math.random()*.6}`;
+    bc.appendChild(bar);
+  }
+}
+
+updateSummary();
+</script>
+</body>
+</html>
